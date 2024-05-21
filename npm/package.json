@@ -4,7 +4,8 @@
   "description": "test npm",
   "main": "index.js",
   "scripts": {
-    "test": "no test"
+    "test": "no test",
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -17,5 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }
