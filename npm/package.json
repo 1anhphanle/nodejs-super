@@ -1,0 +1,21 @@
+{
+  "name": "anh-phan-le",
+  "version": "1.0.0",
+  "description": "test npm",
+  "main": "index.js",
+  "scripts": {
+    "test": "no test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "anhphanle"
+  },
+  "keywords": [
+    "APL"
+  ],
+  "author": "anhphanle",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

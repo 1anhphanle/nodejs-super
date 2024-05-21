@@ -1,0 +1,7 @@
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm uninstall axios
+
+removed 9 packages, and audited 2 packages in 1s
+
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> 
