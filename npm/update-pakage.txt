@@ -1,0 +1,120 @@
+To address all issues, run:
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm i nodemon@2.0.2
+
+added 101 packages, and audited 103 packages in 2s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+5 moderate severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm outdate
+Package  Current  Wanted  Latest  Location              Depended by
+nodemon    2.0.2  2.0.22   3.1.0  node_modules/nodemon  npm
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm update
+
+added 2 packages, removed 73 packages, changed 1 package, and audited 32 packages in 2s
+
+4 packages are looking for funding
+  run `npm fund` for details
+
+3 moderate severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm outdate
+Package  Current  Wanted  Latest  Location              Depended by
+nodemon   2.0.22  2.0.22   3.1.0  node_modules/nodemon  npm
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm>
+
+---Nhưng trong file package.json lại không có sự thay đổi nhưng có sự thay đổi version trong package-lock.json vậy => ko quan trọng vì package-lock mới là cái chứa những package chính
+->ko dc xóa package-lock và phải đẩy nó lên github (ko đẩy vào trong gitnore)
+->sử package.log bằng các thay đổi trực tiếp trong file là cút
+
+--update file package.json
+---chạy npm ncu trong folder chứa package.json
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm install -g npm-check-updates
+npm warn deprecated @npmcli/move-file@2.0.1: This functionality has been moved to @npmcli/fs
+npm warn deprecated npmlog@6.0.2: This package is no longer supported.
+npm warn deprecated read-package-json@6.0.4: This package is no longer supported. Please use @npmcli/package-json instead.
+npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.
+npm warn deprecated gauge@4.0.4: This package is no longer supported.
+
+added 336 packages in 18s
+
+67 packages are looking for funding
+  run `npm fund` for details
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> ncu
+Checking C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm\package.json
+[====================] 2/2 100%
+
+ nodemon  ^2.0.2  →  ^3.1.0
+
+Run ncu -u to upgrade package.json
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> ncu -u
+Upgrading C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm\package.json
+[====================] 2/2 100%
+
+ nodemon  ^2.0.2  →  ^3.1.0
+
+Run npm install to install new versions.
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm install
+
+added 1 package, removed 73 packages, changed 4 packages, and audited 31 packages in 1s
+
+4 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+--làm lại từ đầu
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> ncu -u
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm uninstall nodemon
+
+removed 30 packages, and audited 2 packages in 1s
+
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm i nodemon@2.0.2 -D
+
+added 101 packages, and audited 103 packages in 4s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+5 moderate severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> ncu
+Checking C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm\package.json
+[====================] 2/2 100%
+
+ nodemon  ^2.0.2  →  ^3.1.0
+
+Run ncu -u to upgrade package.json
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> ncu nodemon -u
+Upgrading C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm\package.json
+[====================] 1/1 100%
+
+ nodemon  ^2.0.2  →  ^3.1.0
+
+Run npm install to install new versions.
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm> npm install
+
+added 1 package, removed 73 packages, changed 4 packages, and audited 31 packages in 1s
+
+4 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\npm>
+
+-- lưu ý: khi clone từ github sẽ không có node_modules
+cách cài lại đơn giản là npm install thì sẽ tạo lại node_modules
