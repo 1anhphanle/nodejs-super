@@ -1,0 +1,8 @@
+nhiều nguyên nhân
+- reset máy: khá mệt
+- kill port windown
+
+cách làm:
+1. Mở Command Prompt với quyền Administrator.
+2. netstat -ano | findstr :4000
+3. taskkill /PID [PID] /F
