@@ -1,0 +1,35 @@
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\server-expressjs> node index.js
+node:internal/modules/cjs/loader:1146
+  throw err;
+  ^
+
+Error: Cannot find module 'express'
+Require stack:
+- C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\server-expressjs\index.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1143:15)
+    at Module._load (node:internal/modules/cjs/loader:984:27)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:179:18)
+    at Object.<anonymous> (C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\server-expressjs\index.js:1:17)
+    at Module._compile (node:internal/modules/cjs/loader:1369:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1427:10)
+    at Module.load (node:internal/modules/cjs/loader:1206:32)
+    at Module._load (node:internal/modules/cjs/loader:1022:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:135:12) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\it1de\\OneDrive\\Desktop\\NODEJS-SUPER\\server-expressjs\\index.js'
+  ]
+}
+
+Node.js v20.12.2
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\server-expressjs> npm i express
+
+added 64 packages, and audited 65 packages in 7s
+
+12 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\server-expressjs> node index.js
+Server is running on port 3000
