@@ -1,0 +1,67 @@
+## followers
+
+Một người dùng có thể follow rất nhiều user khác, nếu dùng 1 mảng followings' chứa
+ObjectId trong collection 'users' thi sẽ không tối ưu. Vì dễ chạm đến giới hạn 16MB
+của MongoDB.
+
+Chưa hết, nếu dùng mằng 'followings' thì khi muốn tìm kiếm user A đang follow ai rất
+dễ nhưng ngược lại, tim kiếm ai đang follow user A thi lại rất khó.
+
+Vậy nên ta tạo ra một collection riêng để lưu các mối quan hệ follow giữa các user là
+hợp lý hơn cả.
+
+1 user có rất nhiều follower, và 1 follower cũng có rất nhiều user khác follow lại =
+Quan hệ rất nhiều - rất nhiều
+
+``ts
+interface Follower{
+    _id: ObjectId
+    user_id :ObjectId
+    followed_user_id: ObjectId
+    created_at: Data
+}
+
+You, 16 hours ago . Unco
+
+Chúng ta sẽ chọn ra nhung tính năng chinh của tweet dể clone
+
+1. Tweet có thể chứa text, hashtags, metions, ånh, video
+2. Tweet có thể hiển thị cho everyone hoặc Twitter Circle
+3. Tweet có thể quy định người reply (everyone, người ma chung ta follow, người chúng
+ta metion)
+
+- Tweet sẽ co nested tweet, nghĩa là tweet có thể chứa tweet con bên trong. Nếu dùng
+theo kiểu nested object sẽ không phù hợp, và sớm thôi, nó sẽ chạm đến giới hạn. Chưa
+kể query thông tin 1 tweet con rất khỏ.
+
+Vậy nên ta sẽ lưu trường 'parent_id' đề biết tweet này là con của ai. Nếu 'parent_id'
+là 'null' thì đó là tweet gốc.
+
+- Nếu là tweet bình thường thì sẽ có 'content' là string. Còn nếu là retweet thì sẽ
+không có 'content' ma chỉ có 'parent_id' thoi, Lúc này có thể cho content là '' hoặc
+'null', như mình đã phân tích ở những bài trước thì mình thích để '' hơn, đỡ phải phân
+
+interface Tweet {
+    _id: ObjectId
+    user_id: ObjectId
+    type: TweetType
+    audience: TweetAudience
+    content: string
+    parent_id: null | ObjectId
+    hashtags: ObjegtId[]
+    mentions: ObjectId[]
+    medias: Media[]
+    guest_views: number
+    user_views: number
+    created_at: Date
+    updated_at: Date
+}
+
+interface Media{
+    url: string
+    type: MediaType //video, image
+}
+enum MediaType{
+    Image,
+    Video
+}

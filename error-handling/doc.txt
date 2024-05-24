@@ -20,3 +20,21 @@ lỗi eslint:
 
 
 lỗi nodejs:
+tạo server express
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\error-handling> npm i express --save
+
+up to date, audited 282 packages in 1s
+
+67 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\error-handling> npm i @types/express
+
+added 10 packages, and audited 292 packages in 1s
+
+67 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\error-handling> npm run dev
