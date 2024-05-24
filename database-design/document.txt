@@ -1,0 +1,140 @@
+Cơ sở dữ liệu cơ bản
+Cơ sở dữ liệu là gì?
+Cơ sở dữ liệu (CSDL) là nơi lưu trữ dữ liệu, ví dụ như Google Sheet, MySQL, MongoDB, hoặc các tệp JSON.
+
+Tại sao cần cơ sở dữ liệu?
+Tại sao không chỉ lưu dữ liệu vào các tệp JSON cho đơn giản?
+Điều này là do khi cơ sở dữ liệu lớn lên, việc sử dụng một tệp JSON đơn lẻ sẽ trở nên rất khó quản lý. Một cơ sở dữ liệu có thể có kích thước lên đến hàng chục GB, và mở một tệp JSON có kích thước đó lên sẽ gặp nhiều khó khăn.
+Do đó, chúng ta cần một hệ thống quản lý cơ sở dữ liệu (DBMS - Database Management System) để giúp quản lý việc đọc và ghi dữ liệu một cách thuận tiện hơn.
+
+Một số hệ quản trị cơ sở dữ liệu
+SQL: PostgreSQL, MySQL, Oracle, MariaDB...
+NoSQL: MongoDB, DynamoDB, Cassandra...
+No-code: Google Sheet, Notion...
+
+_______________________
+Followers
+
+Một người dùng có thể theo dõi rất nhiều người dùng khác. Nếu sử dụng mảng 'followings' chứa ObjectId trong collection 'users', điều này sẽ không hiệu quả vì có thể dễ dàng đạt đến giới hạn 16MB của MongoDB.
+Hơn nữa, nếu sử dụng mảng 'followings', việc tìm kiếm người dùng A đang theo dõi ai là dễ dàng, nhưng ngược lại, việc tìm kiếm người dùng đang theo dõi người dùng A sẽ rất khó khăn.
+Vì vậy, chúng ta nên tạo ra một collection riêng để lưu trữ các mối quan hệ theo dõi giữa các người dùng, điều này sẽ hợp lý hơn.
+Một người dùng có thể có rất nhiều người theo dõi, và một người theo dõi cũng có thể theo dõi rất nhiều người khác, tạo ra một mối quan hệ nhiều-nhiều.
+
+interface Follower {
+  _id: ObjectId,
+  user_id: ObjectId,
+  followed_user_id: ObjectId,
+  created_at: Date
+}
+_______________________
+Tweets
+
+Chúng ta sẽ chọn ra những tính năng chính của tweet để clone:
+
+Tweet có thể chứa văn bản, hashtags, mentions, ảnh, video.
+Tweet có thể hiển thị cho mọi người hoặc Twitter Circle.
+Tweet có thể quy định người trả lời (mọi người, người chúng ta follow, người chúng ta mention).
+Tweet sẽ có nested tweet, nghĩa là tweet có thể chứa tweet con bên trong. Nếu sử dụng theo kiểu nested object sẽ không phù hợp, vì sớm thôi, nó sẽ chạm đến giới hạn. Chưa kể query thông tin 1 tweet con rất khó. 
+Vậy nên ta sẽ lưu trường 'parent_id' để biết tweet này là con của ai. Nếu 'parent_id' là 'null' thì đó là tweet gốc.
+Nếu là tweet bình thường thì sẽ có 'content' là string. Còn nếu là retweet thì sẽ không có 'content' mà chỉ có 'parent_id' thôi. Lúc này có thể cho content là `''` hoặc 'null'. 
+Như mình phần tích ở những bài trước thì mình thích để `''` hơn, đỡ phải phân tích trường hợp 'null'. Vậy nên 'content' có thể là 'string'.
+Nếu là `''` thì sẽ chiếm bộ nhớ hơn là null, nhưng điều này không đáng kể so với lợi ích nó mang lại.
+'audience' đại diện cho tính riêng tư của tweet. Ví dụ tweet có thể là public cho mọi người xem hoặc chỉ cho nhóm người nhất định. Vậy nên 'visibility' có thể là 'TweetAudience' enum.
+'type' đại diện cho loại tweet, ví dụ như tweet, retweet, quote tweet.
+'hashtag' là mảng chứa ObjectId của các hashtag. Mỗi tweet có thể chứa nhiều hashtag, vì vậy 'hashtag' có thể là 'ObjectId[]'.
+'mentions' là mảng chứa ObjectId của các người dùng được mention. Mỗi tweet có thể mention nhiều người, vì vậy 'mentions' có thể là 'ObjectId[]'.
+'medias' là mảng chứa ObjectId của các media. Mỗi tweet chỉ có thể chứa một số lượng nhất định các media. Nếu upload ảnh thì sẽ không thể upload video và ngược lại. Vì vậy 'medias' có thể là 'Media[]'.
+
+Trong thực tế, Twitter có rất nhiều chỉ số để phân tích lượt tiếp cận của một tweet. Tuy nhiên, trong giới hạn, chúng ta chỉ phân tích lượt view thôi.
+Lượt view sẽ được phân loại thành 2 loại: 'guest_views' đại diện cho số lượt xem của tweet từ người dùng không đăng nhập và 'user_views' dành cho người dùng đã đăng nhập. Cả hai trường này sẽ có kiểu dữ liệu là 'number'.
+
+interface Tweet {
+    _id: ObjectId
+    user_id: ObjectId
+    type: TweetType
+    audience: TweetAudience
+    content: string
+    parent_id: null | ObjectId
+    hashtags: ObjectId
+    mentions: ObjectId[]
+    medias: Media[]
+    guest_views: number
+    user_views: number
+    created_at: Date
+    updated_at: Date
+}
+
+interface Media {
+  url: string
+  type: MediaType // video, image
+}
+
+enum MediaType {
+  Image,
+  Video
+}
+
+enum TweetAudience {
+  Everyone,
+  TwitterCircle
+}
+
+enum TweetType {
+  Tweet,
+  Retweet,
+  Comment,
+  QuoteTweet
+}
+
+_______________________
+Bookmarks
+Bookmark các tweet lại, mỗi user không giới hạn số lượng bookmark. Lý do không cần 'updated_at' là vì trong trường hợp người dùng unbookmark, chúng ta sẽ xóa tài liệu này đi.
+interface Bookmark {
+  _id: ObjectId
+  user_id: ObjectId
+  tweet_id: ObjectId
+  created_at: Date
+}
+_______________________
+Like
+Likes
+Tương tự như 'bookmarks', chúng ta có bộ sưu tập 'likes'.
+interface Like {
+  _id: ObjectId
+  user_id: ObjectId
+  tweet_id: ObjectId
+  created_at: Date
+}
+_______________________
+Hashtags
+Hỗ trợ tìm kiếm theo hashtag.
+Mỗi tweet có thể có ít hashtag.
+Mỗi hashtag có rất nhiều tweet.
+Không nên làm như dưới đây:
+interface Tweet {
+    _id: ObjectId
+    user_id: ObjectId
+    type: TweetType
+    audience: TweetAudience
+    content: string
+    parent_id: null | ObjectId // chỉ null khi là tweet gốc
+    hashtags: string[] // Không nên nhúng như thế này, vì sẽ gây khó khăn trong việc tìm kiếm những tweet nào có hashtag này, cũng như làm lập lại dữ liệu về tên hashtag
+    mentions: ObjectId[] // Mỗi tweet có thể mention nhiều người
+    medias: Media[] // Mỗi tweet có thể chứa nhiều media
+    guest_views: number // Số lượt xem từ người dùng không đăng nhập
+    user_views: number // Số lượt xem từ người dùng đã đăng nhập
+    created_at: Date // Ngày tạo
+    updated_at: Date // Ngày cập nhật
+}
+=> Quan hệ từ ít đến rất nhiều
+Lưu một mảng ObjectId 'hashtags' trong bộ sưu tập 'tweets'.
+Tạo một bộ sưu tập riêng để lưu 'hashtags' mà không lưu mảng 'tweet_id' vào trong bộ sưu tập 'hashtags'. Vì nếu lưu 'tweet_id' vào trong bộ sưu tập 'hashtags', 
+việc chạm đến giới hạn 16MB của MongoDB sẽ dễ xảy ra. Và cũng không cần thiết để lưu, vì khi tìm kiếm các tweet liên quan đến hashtag thì chúng ta sẽ sử dụng id hashtag để tìm kiếm trong bộ sưu tập 'tweets'.
+interface Hashtag {
+_id: ObjectId,
+name: string,
+created_at: Date
+}
+
+link figma:
+https://drive.google.com/file/d/1cfuDjVSR7JZp-xOK0mo_iov5bHUiUiUh/view?usp=sharing
