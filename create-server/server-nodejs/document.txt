@@ -1,3 +1,7 @@
+1. cài package.json
+2. main.js
+
+----xung dot port
 nhiều nguyên nhân
 - reset máy: khá mệt
 - kill port windown

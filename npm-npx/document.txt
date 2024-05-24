@@ -1,0 +1,71 @@
+NPM
+  npm là standard package manager for node.js
+  - thư viện online
+  - command-line
+
+  bonus: https://duthanhduoc.com/blog/tai-sao-package-lock-json-ton-tai-va-cach-no-hoat-dong
+
+  1. create-file-json: npm init or npm init --y
+  2. cài thư viện: npm i lodash
+  3. xóa thư viện: npm uninstall axios
+  4. cài thư viện global và local
+  - global: npm i nodemon -g, cách sử dụng: nodemon index.js
+
+  - local: npm i nodemon -D
+  khi nào nên cài vào devDependencies: tool, thư viện không nằm trong production. dùng axios, lodash cho api thì cài trong dependencies
+  ----
+  bổ sung:
+    "scripts": {
+      "test": "no test",
+      "start": "nodemon index.js"
+    },
+  ----
+  test: nodemon index.js -> npm run start
+
+  uninstall:
+  global: npm uninstall nodemon-g
+  local: npm uninstall nodemon
+  5. cập nhật thư viện
+  npm i nodemon@2.0.2
+  npm outdate
+  npm update
+  ---Nhưng trong file package.json lại không có sự thay đổi nhưng có sự thay đổi version trong package-lock.json vậy => ko quan trọng vì package-lock mới là cái chứa những package chính
+  ->ko dc xóa package-lock và phải đẩy nó lên github (ko đẩy vào trong gitnore)
+
+  --update file package.json
+  ---chạy npm ncu trong folder chứa package.json
+  npm install -g npm-check-updates
+  ncu
+  ncu -u
+  npm install
+
+  -- lưu ý: khi clone từ github sẽ không có node_modules
+  cách cài lại đơn giản là npm install thì sẽ tạo lại node_modules
+-------------------------------------------------------------------------------
+NPX
+npx để cài nhiều package
+npx create-react-app my-app
+npx cài không cần package.json
+tương tự yarn, pnpm
+---
+cách cài react:
+# Bước 1: Cài đặt Node.js và npm
+# (Kiểm tra Node.js và npm đã được cài đặt)
+node -v
+npm -v
+
+# Bước 2: Tạo một ứng dụng React mới (nếu chưa có)
+npx create-react-app my-app
+
+# Bước 3: Điều hướng vào thư mục dự án
+cd my-app
+
+# Bước 4: Cài đặt các phụ thuộc (nếu cần thiết)
+npm install
+
+# Bước 5: Chạy ứng dụng React
+npm start
+
+---
+đọc thêm cách tạo và publish package lên npm
+https://duthanhduoc.com/blog/tao-va-publish-package-len-npm

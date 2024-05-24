@@ -1,8 +1,9 @@
 {
-  "name": "typescript-eslint",
+  "name": "nodejs-typescript",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx nodemon",
     "build": "rimraf ./dist && tsc && tsc-alias",
     "start": "node dist/index.js",
@@ -16,6 +17,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^7.10.0",
     "@typescript-eslint/parser": "^7.10.0",
@@ -31,7 +33,6 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@types/express": "^4.17.21",
     "express": "^4.19.2"
   }
 }

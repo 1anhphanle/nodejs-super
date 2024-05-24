@@ -1,3 +1,5 @@
+là một framework, tạo server nhanh -> ngoài ra nestjs rất ok
+
 PS C:\Users\it1de\OneDrive\Desktop\NODEJS-SUPER\server-expressjs> node index.js
 node:internal/modules/cjs/loader:1146
   throw err;
