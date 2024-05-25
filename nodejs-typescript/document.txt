@@ -1,2 +1,27 @@
 https://duthanhduoc.com/blog/setup-du-an-nodejs-typescript
 NTS: nodejs typescript eslint
+
+____
+kỹ năng xử lí lỗi
+- lỗi typescript: lỗi liên quan đến kiểu dữ liệu không đúng, có thể bypass bằng any hoặc setting tsconfig
+- lỗi eslint: lỗi liên quan đến linter, có thể bypass bằng disable eslint
+- lỗi node.js: đây là lỗi nghiêm trọng liên quan đến code. không nên bypass lỗi này mà phải xử lý
+cách debug
+- dùng run and debug vscode
+- dùng chat gpt
+- console.log
+
+
+lỗi typescript: 
+bypass bằng `as any` hoặc `as Type...`:
+render(user as any)
+bypass bằng thêm option `--transpileOnly` vào ts-node
+link: https://github.com/TypeStrong/ts-node/tree/main/transpilers
+
+lỗi eslint: 
+file .eslintrc có rule
+
+lỗi nodejs:
+một chút về postman
+
+debug bằng vscode: để sau, hơi lười

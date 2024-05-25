@@ -12,8 +12,74 @@ SQL: PostgreSQL, MySQL, Oracle, MariaDB...
 NoSQL: MongoDB, DynamoDB, Cassandra...
 No-code: Google Sheet, Notion...
 
+link figma:
+https://drive.google.com/file/d/1cfuDjVSR7JZp-xOK0mo_iov5bHUiUiUh/view?usp=sharing
 _______________________
-Followers
+Thiết kế schema Twitter bằng MongoDB
+giải ngố authentication: 3 part 
+
+một số ghi chú:
+tên collection nên đặt theo dạng số nhiều, kiểu snake_case: users
+tên field nên đặt theo kiểu snake_case: email_verify_token
+`_id` là trường MongoDB tự động tạo ra nên không cần theo vào, không nên đổi `_id` thành id hay thay đổi cơ chế của nó -> giảm hiệu suất
+trường `created_at` và `updated_at` nên có kiểu `Date` để dễ sắp xếp, tìm kiếm, lọc theo thời gian
+trường `created_at` nên luôn luôn được thêm vào khi tạo mới document
+trường `updated_at` thì optional
+tất cả trường đại diện id của document thì nên có kiểu `ObjectId`
+để biết kiểu dữ liệu mà Mongo hỗ trợ thì https://docs.mongodb.com/manual/reference/bson-types
+
+phân tích chức năng:
+..............................users
+
+Người dùng đăng ký nhập 'name', 'email', 'day_of_birth', và 'password'. Các trường 'name', 'email', 'day_of_birth', và 'password' là những trường bắt buộc phải có, bên cạnh '_id' là trường tự động tạo ra bởi MongoDB.
+Sau khi đăng ký xong, sẽ có email đính kèm 'email_verify_token' để xác thực email ('anhphanle.com/verify-email?email_verify_token=123321123'). Mỗi user chỉ có 1 'email_verify_token' duy nhất, 
+vì nếu user nhấn re-send email thì sẽ tạo ra 'email_verify_token' mới thay thế cái cũ. Vì vậy, ta lưu thêm trường 'email_verify_token' vào schema 'users'. Trường này có kiểu 'string', nếu user xác thực email thì ta sẽ set `''`
+Tương tự, ta có chức năng quên mật khẩu, khi người dùng quên mật khẩu sẽ nhận được email để reset mật khẩu. Chúng ta cũng dùng 'forgot_password_token' để xác thực ('anhphanle.com/forgot-password?forgot_password_token=123321123'). 
+Vì vậy, ta cũng lưu thêm trường 'forgot_password_token' vào schema 'users'. Trường này có kiểu 'string'. Nếu user reset mật khẩu thì ta sẽ set `''`
+Nên có một trường là 'verify' để biết trạng thái tài khoản của user. Ví dụ: chưa xác thực email, đã xác thực, bị khóa, lên tách xanh. Vậy giá trị của nó nên là enum.
+Người dùng có thể cập nhật các thông tin sau vào profile: 'bio', 'location', 'website', 'username', 'avatar', 'cover_photo'. Vậy ta cũng lưu các trường này vào schema 'users' với kiểu là 'string'. 'avatar' và 'cover_photo' đơn giản chỉ là string URL thôi. 
+Đây là những giá trị optional, tức người dùng không nhập vào thì vẫn dùng bình thường. Nhưng cũng nên lưu rỗng ("") nếu người dùng không nhập gì để tiện quản lý.
+Cuối cùng là trường 'created_at' và 'updated_at' để biết thời gian tạo và cập nhật user. Vậy ta lưu thêm 2 trường này vào schema 'users' với kiểu 'Date'. 2 trường này luôn luôn có giá trị.
+
+enum UserVerifyStatus{
+  Unverified, // chưa xác thực email mặc định là = 0
+  Verified, // đã xác thực email
+  Banned // bị khóa 
+}
+
+interface User {
+  _id: ObjectId;
+  name: string;
+  email: string;
+  date_of_birth: Date;
+  password: string;
+  created_at: Date;
+  updated_at: Date;
+  email_verify_token: string | null; // jwt hoặc null nếu đã xác thực email
+  forgot_password_token: string | null; // jwt hoặc null nếu đã xác thực email
+  verify: UserVerifyStatus;
+  bio?: string; // optional
+  location?: string; // optional
+  website?: string; // optional
+  username?: string; // optional
+  avatar?: string; // optional
+  cover_photo?: string; // optional
+}
+
+..............................refresh_tokens
+Hệ thống sẽ sử dụng JWT để xác thực người dùng. Mỗi lần người dùng đăng nhập thành công sẽ tạo ra 1 JWT access token và 1 refresh token.
+JWT access token không cần lưu vào cơ sở dữ liệu, vì chúng ta sẽ cho nó stateless. Còn refresh token cần lưu vào cơ sở dữ liệu để tăng tính bảo mật.
+Một người dùng có thể có nhiều refresh token (không giới hạn), nên không thể lưu hết vào trong bộ sưu tập 'users' được = Quan hệ 1 - rất nhiều.
+Và đôi khi chúng ta chỉ quan tâm đến refresh token mà không cần biết người dùng là ai. Vậy nên ta sẽ tạo một collection riêng để lưu refresh token
+
+ interface RefreshToken {
+  _id: ObjectId
+  token: string
+  created_at: Date
+  user_id: ObjectId
+ }
+
+..............................Followers
 
 Một người dùng có thể theo dõi rất nhiều người dùng khác. Nếu sử dụng mảng 'followings' chứa ObjectId trong collection 'users', điều này sẽ không hiệu quả vì có thể dễ dàng đạt đến giới hạn 16MB của MongoDB.
 Hơn nữa, nếu sử dụng mảng 'followings', việc tìm kiếm người dùng A đang theo dõi ai là dễ dàng, nhưng ngược lại, việc tìm kiếm người dùng đang theo dõi người dùng A sẽ rất khó khăn.
@@ -26,8 +92,9 @@ interface Follower {
   followed_user_id: ObjectId,
   created_at: Date
 }
-_______________________
-Tweets
+
+
+..............................Tweets
 
 Chúng ta sẽ chọn ra những tính năng chính của tweet để clone:
 
@@ -86,17 +153,7 @@ enum TweetType {
   QuoteTweet
 }
 
-_______________________
-Bookmarks
-Bookmark các tweet lại, mỗi user không giới hạn số lượng bookmark. Lý do không cần 'updated_at' là vì trong trường hợp người dùng unbookmark, chúng ta sẽ xóa tài liệu này đi.
-interface Bookmark {
-  _id: ObjectId
-  user_id: ObjectId
-  tweet_id: ObjectId
-  created_at: Date
-}
-_______________________
-Like
+..............................Like
 Likes
 Tương tự như 'bookmarks', chúng ta có bộ sưu tập 'likes'.
 interface Like {
@@ -105,26 +162,26 @@ interface Like {
   tweet_id: ObjectId
   created_at: Date
 }
-_______________________
-Hashtags
+
+..............................Hashtags
 Hỗ trợ tìm kiếm theo hashtag.
 Mỗi tweet có thể có ít hashtag.
 Mỗi hashtag có rất nhiều tweet.
 Không nên làm như dưới đây:
 interface Tweet {
-    _id: ObjectId
-    user_id: ObjectId
-    type: TweetType
-    audience: TweetAudience
-    content: string
-    parent_id: null | ObjectId // chỉ null khi là tweet gốc
-    hashtags: string[] // Không nên nhúng như thế này, vì sẽ gây khó khăn trong việc tìm kiếm những tweet nào có hashtag này, cũng như làm lập lại dữ liệu về tên hashtag
-    mentions: ObjectId[] // Mỗi tweet có thể mention nhiều người
-    medias: Media[] // Mỗi tweet có thể chứa nhiều media
-    guest_views: number // Số lượt xem từ người dùng không đăng nhập
-    user_views: number // Số lượt xem từ người dùng đã đăng nhập
-    created_at: Date // Ngày tạo
-    updated_at: Date // Ngày cập nhật
+  _id: ObjectId
+  user_id: ObjectId
+  type: TweetType
+  audience: TweetAudience
+  content: string
+  parent_id: null | ObjectId // chỉ null khi là tweet gốc
+  hashtags: string[] // Không nên nhúng như thế này, vì sẽ gây khó khăn trong việc tìm kiếm những tweet nào có hashtag này, cũng như làm lập lại dữ liệu về tên hashtag
+  mentions: ObjectId[] // Mỗi tweet có thể mention nhiều người
+  medias: Media[] // Mỗi tweet có thể chứa nhiều media
+  guest_views: number // Số lượt xem từ người dùng không đăng nhập
+  user_views: number // Số lượt xem từ người dùng đã đăng nhập
+  created_at: Date // Ngày tạo
+  updated_at: Date // Ngày cập nhật
 }
 => Quan hệ từ ít đến rất nhiều
 Lưu một mảng ObjectId 'hashtags' trong bộ sưu tập 'tweets'.
@@ -136,5 +193,11 @@ name: string,
 created_at: Date
 }
 
-link figma:
-https://drive.google.com/file/d/1cfuDjVSR7JZp-xOK0mo_iov5bHUiUiUh/view?usp=sharing
+..............................Bookmarks
+Bookmark các tweet lại, mỗi user không giới hạn số lượng bookmark. Lý do không cần 'updated_at' là vì trong trường hợp người dùng unbookmark, chúng ta sẽ xóa tài liệu này đi.
+interface Bookmark {
+  _id: ObjectId
+  user_id: ObjectId
+  tweet_id: ObjectId
+  created_at: Date
+}
