@@ -1,24 +1,30 @@
-Cơ sở dữ liệu cơ bản
-Cơ sở dữ liệu là gì?
+## Cơ sở dữ liệu cơ bản
+## Cơ sở dữ liệu là gì?
 Cơ sở dữ liệu (CSDL) là nơi lưu trữ dữ liệu, ví dụ như Google Sheet, MySQL, MongoDB, hoặc các tệp JSON.
 
-Tại sao cần cơ sở dữ liệu?
-Tại sao không chỉ lưu dữ liệu vào các tệp JSON cho đơn giản?
-Điều này là do khi cơ sở dữ liệu lớn lên, việc sử dụng một tệp JSON đơn lẻ sẽ trở nên rất khó quản lý. Một cơ sở dữ liệu có thể có kích thước lên đến hàng chục GB, và mở một tệp JSON có kích thước đó lên sẽ gặp nhiều khó khăn.
+## Tại sao cần cơ sở dữ liệu? Tại sao không chỉ lưu dữ liệu vào các tệp JSON cho đơn giản?
+Điều này là do khi cơ sở dữ liệu lớn lên, việc sử dụng một tệp JSON đơn lẻ sẽ trở nên rất khó quản lý. Một cơ sở dữ liệu có thể có kích thước lên đến hàng chục GB, 
+và mở một tệp JSON có kích thước đó lên sẽ gặp nhiều khó khăn.
 Do đó, chúng ta cần một hệ thống quản lý cơ sở dữ liệu (DBMS - Database Management System) để giúp quản lý việc đọc và ghi dữ liệu một cách thuận tiện hơn.
 
-Một số hệ quản trị cơ sở dữ liệu
+## Một số hệ quản trị cơ sở dữ liệu
 SQL: PostgreSQL, MySQL, Oracle, MariaDB...
 NoSQL: MongoDB, DynamoDB, Cassandra...
 No-code: Google Sheet, Notion...
 
+## tài nguyên tham khảo
 link figma:
 https://drive.google.com/file/d/1cfuDjVSR7JZp-xOK0mo_iov5bHUiUiUh/view?usp=sharing
-_______________________
-Thiết kế schema Twitter bằng MongoDB
+thiết kế csdl sau cho chuẩn:
+https://duthanhduoc.com/blog/thiet-ke-co-so-du-lieu-voi-mongodb
+git:
+https://duthanhduoc.com/blog/toi-hoc-lai-git-tu-dau-part-1
+https://duthanhduoc.com/blog/toi-hoc-lai-git-tu-dau-part-2
+https://duthanhduoc.com/blog/top-nhung-cau-lenh-git-dung-trong-thuc-te
 giải ngố authentication: 3 part 
 
-một số ghi chú:
+## Thiết kế schema Twitter bằng MongoDB
+## ghi chú:
 tên collection nên đặt theo dạng số nhiều, kiểu snake_case: users
 tên field nên đặt theo kiểu snake_case: email_verify_token
 `_id` là trường MongoDB tự động tạo ra nên không cần theo vào, không nên đổi `_id` thành id hay thay đổi cơ chế của nó -> giảm hiệu suất
@@ -28,18 +34,23 @@ trường `updated_at` thì optional
 tất cả trường đại diện id của document thì nên có kiểu `ObjectId`
 để biết kiểu dữ liệu mà Mongo hỗ trợ thì https://docs.mongodb.com/manual/reference/bson-types
 
-phân tích chức năng:
-..............................users
+## phân tích chức năng:
+```users```
 
-Người dùng đăng ký nhập 'name', 'email', 'day_of_birth', và 'password'. Các trường 'name', 'email', 'day_of_birth', và 'password' là những trường bắt buộc phải có, bên cạnh '_id' là trường tự động tạo ra bởi MongoDB.
-Sau khi đăng ký xong, sẽ có email đính kèm 'email_verify_token' để xác thực email ('anhphanle.com/verify-email?email_verify_token=123321123'). Mỗi user chỉ có 1 'email_verify_token' duy nhất, 
-vì nếu user nhấn re-send email thì sẽ tạo ra 'email_verify_token' mới thay thế cái cũ. Vì vậy, ta lưu thêm trường 'email_verify_token' vào schema 'users'. Trường này có kiểu 'string', nếu user xác thực email thì ta sẽ set `''`
-Tương tự, ta có chức năng quên mật khẩu, khi người dùng quên mật khẩu sẽ nhận được email để reset mật khẩu. Chúng ta cũng dùng 'forgot_password_token' để xác thực ('anhphanle.com/forgot-password?forgot_password_token=123321123'). 
+Người dùng đăng ký nhập 'name', 'email', 'day_of_birth', và 'password'. Các trường 'name', 'email', 'day_of_birth', và 'password' là những trường bắt buộc phải có, 
+bên cạnh '_id' là trường tự động tạo ra bởi MongoDB.
+Sau khi đăng ký xong, sẽ có email đính kèm 'email_verify_token' để xác thực email ('anhphanle.com/verify-email?email_verify_token=123321123'). Mỗi user chỉ có 1 
+'email_verify_token' duy nhất, vì nếu user nhấn re-send email thì sẽ tạo ra 'email_verify_token' mới thay thế cái cũ. Vì vậy, ta lưu thêm trường 'email_verify_token' 
+vào schema 'users'. Trường này có kiểu 'string', nếu user xác thực email thì ta sẽ set `''`
+Tương tự, ta có chức năng quên mật khẩu, khi người dùng quên mật khẩu sẽ nhận được email để reset mật khẩu. Chúng ta cũng dùng 'forgot_password_token' để xác thực 
+('anhphanle.com/forgot-password?forgot_password_token=123321123'). 
 Vì vậy, ta cũng lưu thêm trường 'forgot_password_token' vào schema 'users'. Trường này có kiểu 'string'. Nếu user reset mật khẩu thì ta sẽ set `''`
 Nên có một trường là 'verify' để biết trạng thái tài khoản của user. Ví dụ: chưa xác thực email, đã xác thực, bị khóa, lên tách xanh. Vậy giá trị của nó nên là enum.
-Người dùng có thể cập nhật các thông tin sau vào profile: 'bio', 'location', 'website', 'username', 'avatar', 'cover_photo'. Vậy ta cũng lưu các trường này vào schema 'users' với kiểu là 'string'. 'avatar' và 'cover_photo' đơn giản chỉ là string URL thôi. 
+Người dùng có thể cập nhật các thông tin sau vào profile: 'bio', 'location', 'website', 'username', 'avatar', 'cover_photo'. Vậy ta cũng lưu các trường này vào schema 
+'users' với kiểu là 'string'. 'avatar' và 'cover_photo' đơn giản chỉ là string URL thôi. 
 Đây là những giá trị optional, tức người dùng không nhập vào thì vẫn dùng bình thường. Nhưng cũng nên lưu rỗng ("") nếu người dùng không nhập gì để tiện quản lý.
-Cuối cùng là trường 'created_at' và 'updated_at' để biết thời gian tạo và cập nhật user. Vậy ta lưu thêm 2 trường này vào schema 'users' với kiểu 'Date'. 2 trường này luôn luôn có giá trị.
+Cuối cùng là trường 'created_at' và 'updated_at' để biết thời gian tạo và cập nhật user. Vậy ta lưu thêm 2 trường này vào schema 'users' với kiểu 'Date'. 2 trường này 
+luôn luôn có giá trị.
 
 enum UserVerifyStatus{
   Unverified, // chưa xác thực email mặc định là = 0
@@ -66,7 +77,7 @@ interface User {
   cover_photo?: string; // optional
 }
 
-..............................refresh_tokens
+```refresh_tokens```
 Hệ thống sẽ sử dụng JWT để xác thực người dùng. Mỗi lần người dùng đăng nhập thành công sẽ tạo ra 1 JWT access token và 1 refresh token.
 JWT access token không cần lưu vào cơ sở dữ liệu, vì chúng ta sẽ cho nó stateless. Còn refresh token cần lưu vào cơ sở dữ liệu để tăng tính bảo mật.
 Một người dùng có thể có nhiều refresh token (không giới hạn), nên không thể lưu hết vào trong bộ sưu tập 'users' được = Quan hệ 1 - rất nhiều.
@@ -79,10 +90,12 @@ Và đôi khi chúng ta chỉ quan tâm đến refresh token mà không cần bi
   user_id: ObjectId
  }
 
-..............................Followers
+```Followers```
 
-Một người dùng có thể theo dõi rất nhiều người dùng khác. Nếu sử dụng mảng 'followings' chứa ObjectId trong collection 'users', điều này sẽ không hiệu quả vì có thể dễ dàng đạt đến giới hạn 16MB của MongoDB.
-Hơn nữa, nếu sử dụng mảng 'followings', việc tìm kiếm người dùng A đang theo dõi ai là dễ dàng, nhưng ngược lại, việc tìm kiếm người dùng đang theo dõi người dùng A sẽ rất khó khăn.
+Một người dùng có thể theo dõi rất nhiều người dùng khác. Nếu sử dụng mảng 'followings' chứa ObjectId trong collection 'users', điều này sẽ không hiệu quả vì có thể dễ 
+dàng đạt đến giới hạn 16MB của MongoDB.
+Hơn nữa, nếu sử dụng mảng 'followings', việc tìm kiếm người dùng A đang theo dõi ai là dễ dàng, nhưng ngược lại, việc tìm kiếm người dùng đang theo dõi người dùng A sẽ 
+rất khó khăn.
 Vì vậy, chúng ta nên tạo ra một collection riêng để lưu trữ các mối quan hệ theo dõi giữa các người dùng, điều này sẽ hợp lý hơn.
 Một người dùng có thể có rất nhiều người theo dõi, và một người theo dõi cũng có thể theo dõi rất nhiều người khác, tạo ra một mối quan hệ nhiều-nhiều.
 
@@ -94,15 +107,15 @@ interface Follower {
 }
 
 
-..............................Tweets
+```Tweets```
 
 Chúng ta sẽ chọn ra những tính năng chính của tweet để clone:
 
 Tweet có thể chứa văn bản, hashtags, mentions, ảnh, video.
 Tweet có thể hiển thị cho mọi người hoặc Twitter Circle.
 Tweet có thể quy định người trả lời (mọi người, người chúng ta follow, người chúng ta mention).
-Tweet sẽ có nested tweet, nghĩa là tweet có thể chứa tweet con bên trong. Nếu sử dụng theo kiểu nested object sẽ không phù hợp, vì sớm thôi, nó sẽ chạm đến giới hạn. Chưa kể query thông tin 1 tweet con rất khó. 
-Vậy nên ta sẽ lưu trường 'parent_id' để biết tweet này là con của ai. Nếu 'parent_id' là 'null' thì đó là tweet gốc.
+Tweet sẽ có nested tweet, nghĩa là tweet có thể chứa tweet con bên trong. Nếu sử dụng theo kiểu nested object sẽ không phù hợp, vì sớm thôi, nó sẽ chạm đến giới hạn. 
+Chưa kể query thông tin 1 tweet con rất khó. Vậy nên ta sẽ lưu trường 'parent_id' để biết tweet này là con của ai. Nếu 'parent_id' là 'null' thì đó là tweet gốc.
 Nếu là tweet bình thường thì sẽ có 'content' là string. Còn nếu là retweet thì sẽ không có 'content' mà chỉ có 'parent_id' thôi. Lúc này có thể cho content là `''` hoặc 'null'. 
 Như mình phần tích ở những bài trước thì mình thích để `''` hơn, đỡ phải phân tích trường hợp 'null'. Vậy nên 'content' có thể là 'string'.
 Nếu là `''` thì sẽ chiếm bộ nhớ hơn là null, nhưng điều này không đáng kể so với lợi ích nó mang lại.
@@ -110,10 +123,12 @@ Nếu là `''` thì sẽ chiếm bộ nhớ hơn là null, nhưng điều này k
 'type' đại diện cho loại tweet, ví dụ như tweet, retweet, quote tweet.
 'hashtag' là mảng chứa ObjectId của các hashtag. Mỗi tweet có thể chứa nhiều hashtag, vì vậy 'hashtag' có thể là 'ObjectId[]'.
 'mentions' là mảng chứa ObjectId của các người dùng được mention. Mỗi tweet có thể mention nhiều người, vì vậy 'mentions' có thể là 'ObjectId[]'.
-'medias' là mảng chứa ObjectId của các media. Mỗi tweet chỉ có thể chứa một số lượng nhất định các media. Nếu upload ảnh thì sẽ không thể upload video và ngược lại. Vì vậy 'medias' có thể là 'Media[]'.
+'medias' là mảng chứa ObjectId của các media. Mỗi tweet chỉ có thể chứa một số lượng nhất định các media. Nếu upload ảnh thì sẽ không thể upload video và ngược lại. 
+Vì vậy 'medias' có thể là 'Media[]'.
 
 Trong thực tế, Twitter có rất nhiều chỉ số để phân tích lượt tiếp cận của một tweet. Tuy nhiên, trong giới hạn, chúng ta chỉ phân tích lượt view thôi.
-Lượt view sẽ được phân loại thành 2 loại: 'guest_views' đại diện cho số lượt xem của tweet từ người dùng không đăng nhập và 'user_views' dành cho người dùng đã đăng nhập. Cả hai trường này sẽ có kiểu dữ liệu là 'number'.
+Lượt view sẽ được phân loại thành 2 loại: 'guest_views' đại diện cho số lượt xem của tweet từ người dùng không đăng nhập và 'user_views' dành cho người dùng đã đăng nhập. 
+Cả hai trường này sẽ có kiểu dữ liệu là 'number'.
 
 interface Tweet {
     _id: ObjectId
@@ -153,7 +168,7 @@ enum TweetType {
   QuoteTweet
 }
 
-..............................Like
+```Like```
 Likes
 Tương tự như 'bookmarks', chúng ta có bộ sưu tập 'likes'.
 interface Like {
@@ -163,7 +178,7 @@ interface Like {
   created_at: Date
 }
 
-..............................Hashtags
+```Hashtags```
 Hỗ trợ tìm kiếm theo hashtag.
 Mỗi tweet có thể có ít hashtag.
 Mỗi hashtag có rất nhiều tweet.
@@ -175,7 +190,7 @@ interface Tweet {
   audience: TweetAudience
   content: string
   parent_id: null | ObjectId // chỉ null khi là tweet gốc
-  hashtags: string[] // Không nên nhúng như thế này, vì sẽ gây khó khăn trong việc tìm kiếm những tweet nào có hashtag này, cũng như làm lập lại dữ liệu về tên hashtag
+  khong nen: hashtags: string[] // Không nên nhúng như thế này, vì sẽ gây khó khăn trong việc tìm kiếm những tweet nào có hashtag này, cũng như làm lập lại dữ liệu về tên hashtag
   mentions: ObjectId[] // Mỗi tweet có thể mention nhiều người
   medias: Media[] // Mỗi tweet có thể chứa nhiều media
   guest_views: number // Số lượt xem từ người dùng không đăng nhập
@@ -186,18 +201,178 @@ interface Tweet {
 => Quan hệ từ ít đến rất nhiều
 Lưu một mảng ObjectId 'hashtags' trong bộ sưu tập 'tweets'.
 Tạo một bộ sưu tập riêng để lưu 'hashtags' mà không lưu mảng 'tweet_id' vào trong bộ sưu tập 'hashtags'. Vì nếu lưu 'tweet_id' vào trong bộ sưu tập 'hashtags', 
-việc chạm đến giới hạn 16MB của MongoDB sẽ dễ xảy ra. Và cũng không cần thiết để lưu, vì khi tìm kiếm các tweet liên quan đến hashtag thì chúng ta sẽ sử dụng id hashtag để tìm kiếm trong bộ sưu tập 'tweets'.
+việc chạm đến giới hạn 16MB của MongoDB sẽ dễ xảy ra. Và cũng không cần thiết để lưu, vì khi tìm kiếm các tweet liên quan đến hashtag thì chúng ta sẽ sử dụng id hashtag 
+để tìm kiếm trong bộ sưu tập 'tweets'.
 interface Hashtag {
 _id: ObjectId,
 name: string,
 created_at: Date
 }
 
-..............................Bookmarks
-Bookmark các tweet lại, mỗi user không giới hạn số lượng bookmark. Lý do không cần 'updated_at' là vì trong trường hợp người dùng unbookmark, chúng ta sẽ xóa tài liệu này đi.
+```Bookmarks```
+Bookmark các tweet lại, mỗi user không giới hạn số lượng bookmark. Lý do không cần 'updated_at' là vì trong trường hợp người dùng unbookmark, chúng ta sẽ xóa tài liệu 
+này đi.
 interface Bookmark {
   _id: ObjectId
   user_id: ObjectId
   tweet_id: ObjectId
   created_at: Date
 }
+______________________________
+Đây là đoạn văn đã được sửa lại cho đúng ngữ pháp và dễ hiểu hơn:
+
+---
+
+## SQL vs NoSQL
+
+### SQL
+
+- Học một ngôn ngữ nhưng có thể sử dụng ở nhiều cơ sở dữ liệu khác nhau.
+- Schema chặt chẽ.
+- Khuyến khích các tiêu chuẩn chuẩn hóa để giảm thiểu sự dư thừa dữ liệu.
+- Có thể mở rộng nhưng sẽ hơi tốn công.
+
+### NoSQL
+
+- Dữ liệu được lưu dưới dạng JSON với các cặp key-value.
+- Không cần schema, lưu được hầu như bất cứ thứ gì.
+- Hiệu năng tuyệt vời, mở rộng theo chiều ngang dễ dàng.
+
+### Ví dụ NoSQL
+Chúng ta cần xây dựng hệ thống dữ liệu cho danh bạ. Vậy nên sau khi khảo sát, chúng ta có được bảng 'contacts' như sau:
+
+- id
+- title
+- firstname
+- lastname
+- gender
+- telephone
+- email
+- address1
+- address2
+- address3
+- city
+- region
+- zipcode
+- country
+---
+
+## Vấn đề 1: Sau một thời gian làm việc với code, chúng ta nhận ra rằng rất ít người chỉ có một số điện thoại. Thường thì họ sẽ có số điện thoại nơi làm việc, ở nhà, cá nhân, v.v. Do đó, chúng ta không thể thêm các cột như 'telephone1', 'telephone2', ... vào bảng 'contacts' được. Thay vào đó, chúng ta sẽ tạo thêm một bảng riêng là 'telephones' với các trường:
+
+- id
+- contact_id
+- number
+- telephone_type (kiểu enum để lưu loại số điện thoại: ở nhà, công ty, ...)
+
+## Vấn đề 2: Chúng ta lại gặp vấn đề tương tự với email, khi người dùng có thể có nhiều email. Vì vậy, chúng ta sẽ tạo thêm bảng 'emails' với các trường:
+
+- id
+- contact_id
+- address
+- email_type (có thể lưu dưới dạng text hoặc enum cho các loại email: cá nhân, công ty, ...)
+
+## Vấn đề 3: Người dùng có thể có nhiều địa chỉ nhà, nên chúng ta tạo thêm bảng 'addresses' với các trường:
+
+- id
+- contact_id
+- address_type
+- address
+- city
+- region
+- zipcode
+- country
+
+Cuối cùng, bảng 'contacts' sẽ có các trường:
+
+- id
+- title
+- firstname
+- lastname
+- gender
+
+Với cách tiếp cận này, chúng ta đã chuẩn hóa được dữ liệu, phòng ngừa rủi ro khi dữ liệu tăng lên.
+
+## Nhưng không
+Chúng ta chưa xem xét hết các yêu cầu trong tương lai. Chỉ vài tuần nữa, yêu cầu có thể là thêm các trường như 'date_of_birth', 'company' vào bảng 'contacts'. 
+Và cho dù chúng ta thêm bao nhiêu trường đi nữa thì cũng không thể cảm thấy đủ, vì các yêu cầu sẽ liên tục được bổ sung như 'social_network_account', 'hobby', ... 
+Vậy mỗi lần thêm một trường vào bảng, chúng ta đều phải suy nghĩ đến việc tạo thêm một bảng 'otherdata' hay sao?
+> Điều này làm cho cơ sở dữ liệu của chúng ta bị chia nhỏ ra hàng chục, hàng trăm bảng, dẫn đến phân mảnh dữ liệu. Việc phân mảnh cơ sở dữ liệu sẽ làm cho các lập trình
+viên khó quan sát được logic của hệ thống, và độ phức tạp tăng lên, dẫn đến thời gian phát triển ứng dụng bị chậm lại.
+Khi chúng ta muốn truy vấn để lấy dữ liệu đầy đủ của một contact, chúng ta phải dùng JOIN kết hợp với hàng chục bảng liên quan.
+
+Áp dụng full-text search cũng khó hơn. Ví dụ, khi ai đó nhập một chuỗi bất kỳ để tìm kiếm trong danh bạ, chúng ta phải kiểm tra tất cả trong các bảng 'contacts', 
+'telephones', 'addresses', 'emails', v.v. và sắp xếp thứ tự các kết quả tương ứng.
+->SQL quá cứng nhắc.
+
+## Dùng NoSQL (MongoDB) thay thế
+Dữ liệu của bảng 'contacts' liên quan đến con người. Chúng ta không thể đoán trước được yêu cầu sẽ thay đổi theo thời gian. Vậy nên, lúc này NoSQL sẽ phát huy ưu điểm 
+của mình. Chúng ta có thể lưu tất cả dữ liệu liên quan đến 'contacts' trong một document của một collection duy nhất, ví dụ như sau:
+
+{
+  "name": ["Billy", "Bob", "Jones"],
+  "company": "Fake Goods Corp",
+  "jobtitle": "Vice President of Data Management",
+  "telephone": {
+    "home": "0123456789",
+    "mobile": "9876543210",
+    "work": "2244668800"
+  },
+  "email": {
+    "personal": "bob@myhomeemail.net",
+    "work": "bob@myworkemail.com"
+  },
+  "address": {
+    "home": {
+      "line1": "10 Non-Existent Street",
+      "city": "Nowhere",
+      "country": "Australia"
+    }
+  },
+  "birthdate": "1980-01-01T00:00:00.000Z",
+  "twitter": "@bobsfakeaccount",
+  "note": "Don't trust this guy",
+  "weight": "200lb",
+  "photo": "52e86ad749e0b817d25c8892.jpg"
+}
+
+
+## Nhận xét
+Trong dữ liệu trên, chúng ta chưa lưu 'date_of_birth' hay 'social_network_account', nhưng không sao, vì NoSQL rất linh hoạt trong trường hợp này, có thể thêm, sửa, xóa 
+thoải mái.
+Vì chúng ta lưu hết trong một document, chúng ta có thể dễ dàng biết được cấu trúc tổng quát của dữ liệu, cũng như dễ dàng thực hiện full-text search trên tất cả các 
+trường trong 'contacts'.
+Đầu tiên, chúng ta định nghĩa index cho tất cả các trường trong collection 'contacts':
+  db.contacts.createIndex({ '$**': 'text' })
+và thực hiện full-text search:
+  db.contacts.find({
+    $text: { $search: 'something' }
+  })
+
+
+## Khi nào nên dùng MongoDB
+MongoDB là cơ sở dữ liệu đa năng được sử dụng theo nhiều cách khác nhau và có thể ứng dụng trong nhiều ngành nghề (viễn thông, game, tài chính, sức khỏe, bán lẻ).
+- Khi muốn tách hợp lượng dữ liệu lớn.
+- Dữ liệu có cấu trúc phức tạp.
+- Khi cần một cơ sở dữ liệu có khả năng mở rộng nhanh, rẻ.
+- Khi cần một cơ sở dữ liệu giúp tăng tốc độ phát triển phần mềm.
+
+## Khi nào nên dùng SQL
+- Cần một cơ sở dữ liệu chặt chẽ về cấu trúc.
+- Bạn quen thuộc với ngôn ngữ SQL.
+
+## Kết nối MongoDB
+
+- Dùng Mongo Compass
+- Dùng MongoSH (terminal)
+- Dùng mongo driver (SDK tích hợp vào code)
+- Dùng Extension MongoDB cho VS Code
+
+## Một số thuật ngữ trong MongoDB
+  Organizations: Cấp độ cao nhất trong MongoDB Atlas, là một đơn vị tổ chức lớn.
+  Project: Một Organization có thể chứa nhiều project. Mỗi project là một không gian làm việc độc lập trong MongoDB Atlas.
+  Cluster: Một project có thể chứa nhiều cluster. Cluster có thể hiểu như là một máy chủ ảo hoặc một nhóm các máy chủ dùng để cài đặt MongoDB. Mỗi cluster là một bản sao của MongoDB chạy trên các máy chủ có khả năng mở rộng.
+  Database: Một cluster có thể chứa nhiều database. Database trong MongoDB tương tự như database trong hệ quản trị cơ sở dữ liệu SQL, là nơi lưu trữ các tập hợp dữ liệu liên quan.
+  Collection: Trong mỗi database, chúng ta có các collection. Collection trong MongoDB tương đương với bảng trong SQL. Mỗi collection là một tập hợp các tài liệu có cấu trúc tương tự nhau.
+  Document: Mỗi collection chứa nhiều document. Document trong MongoDB tương đương với hàng trong SQL. Mỗi document là một bản ghi độc lập chứa dữ liệu dưới dạng BSON (Binary JSON).
+
+Điều này có nghĩa là dữ liệu trong MongoDB được tổ chức theo các cấp độ từ cao đến thấp như sau: Organizations > Project > Cluster > Database > Collection > Document.
