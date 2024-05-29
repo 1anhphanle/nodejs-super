@@ -22,8 +22,179 @@ https://duthanhduoc.com/blog/toi-hoc-lai-git-tu-dau-part-1
 https://duthanhduoc.com/blog/toi-hoc-lai-git-tu-dau-part-2
 https://duthanhduoc.com/blog/top-nhung-cau-lenh-git-dung-trong-thuc-te
 giải ngố authentication: 3 part 
+crud MongoDB với UI và MongoSH
+https://www.mongodb.com/docs/manual/crud/
 
+db.comments.insertMany([{content: "ars vo dich"}, {content: "xin in4"}, {content: "nice"}])
+db.comments.findOne({content: "ars vo dich"})
+db.comments.updateOne({_id: ObjectId("6656a601c6b3306a46ea527a")}, {$set: {content: "Hi mongoDB"}})
+db.comments.updateOne({_id: ObjectId("6656a601c6b3306a46ba527b")}, {$set: {content: "Hi LQH"}}, {upsert: true})
+{
+  acknowledged: true,
+  insertedId: ObjectId('6656a601c6b3306a46ba527b'),
+  matchedCount: 0,
+  modifiedCount: 0,
+  upsertedCount: 1
+}
+db.comments.deleteOne({_id: ObjectId("6656a601c6b3306a46ba527b")})
+
+
+
+## SQL vs NoSQL
+
+### SQL
+
+- Học một ngôn ngữ nhưng có thể sử dụng ở nhiều cơ sở dữ liệu khác nhau.
+- Schema chặt chẽ.
+- Khuyến khích các tiêu chuẩn chuẩn hóa để giảm thiểu sự dư thừa dữ liệu.
+- Có thể mở rộng nhưng sẽ hơi tốn công.
+
+### NoSQL
+
+- Dữ liệu được lưu dưới dạng JSON với các cặp key-value.
+- Không cần schema, lưu được hầu như bất cứ thứ gì.
+- Hiệu năng tuyệt vời, mở rộng theo chiều ngang dễ dàng.
+
+### Ví dụ NoSQL
+Chúng ta cần xây dựng hệ thống dữ liệu cho danh bạ. Vậy nên sau khi khảo sát, chúng ta có được bảng 'contacts' như sau:
+
+- id
+- title
+- firstname
+- lastname
+- gender
+- telephone
+- email
+- address1
+- address2
+- address3
+- city
+- region
+- zipcode
+- country
+---
+
+## Vấn đề 1: Sau một thời gian làm việc với code, chúng ta nhận ra rằng rất ít người chỉ có một số điện thoại. Thường thì họ sẽ có số điện thoại nơi làm việc, ở nhà, cá nhân, v.v. Do đó, chúng ta không thể thêm các cột như 'telephone1', 'telephone2', ... vào bảng 'contacts' được. Thay vào đó, chúng ta sẽ tạo thêm một bảng riêng là 'telephones' với các trường:
+
+- id
+- contact_id
+- number
+- telephone_type (kiểu enum để lưu loại số điện thoại: ở nhà, công ty, ...)
+
+## Vấn đề 2: Chúng ta lại gặp vấn đề tương tự với email, khi người dùng có thể có nhiều email. Vì vậy, chúng ta sẽ tạo thêm bảng 'emails' với các trường:
+
+- id
+- contact_id
+- address
+- email_type (có thể lưu dưới dạng text hoặc enum cho các loại email: cá nhân, công ty, ...)
+
+## Vấn đề 3: Người dùng có thể có nhiều địa chỉ nhà, nên chúng ta tạo thêm bảng 'addresses' với các trường:
+
+- id
+- contact_id
+- address_type
+- address
+- city
+- region
+- zipcode
+- country
+
+Cuối cùng, bảng 'contacts' sẽ có các trường:
+
+- id
+- title
+- firstname
+- lastname
+- gender
+
+Với cách tiếp cận này, chúng ta đã chuẩn hóa được dữ liệu, phòng ngừa rủi ro khi dữ liệu tăng lên.
+
+## Nhưng không
+Chúng ta chưa xem xét hết các yêu cầu trong tương lai. Chỉ vài tuần nữa, yêu cầu có thể là thêm các trường như 'date_of_birth', 'company' vào bảng 'contacts'. 
+Và cho dù chúng ta thêm bao nhiêu trường đi nữa thì cũng không thể cảm thấy đủ, vì các yêu cầu sẽ liên tục được bổ sung như 'social_network_account', 'hobby', ... 
+Vậy mỗi lần thêm một trường vào bảng, chúng ta đều phải suy nghĩ đến việc tạo thêm một bảng 'otherdata' hay sao?
+> Điều này làm cho cơ sở dữ liệu của chúng ta bị chia nhỏ ra hàng chục, hàng trăm bảng, dẫn đến phân mảnh dữ liệu. Việc phân mảnh cơ sở dữ liệu sẽ làm cho các lập trình
+viên khó quan sát được logic của hệ thống, và độ phức tạp tăng lên, dẫn đến thời gian phát triển ứng dụng bị chậm lại.
+Khi chúng ta muốn truy vấn để lấy dữ liệu đầy đủ của một contact, chúng ta phải dùng JOIN kết hợp với hàng chục bảng liên quan.
+
+Áp dụng full-text search cũng khó hơn. Ví dụ, khi ai đó nhập một chuỗi bất kỳ để tìm kiếm trong danh bạ, chúng ta phải kiểm tra tất cả trong các bảng 'contacts', 
+'telephones', 'addresses', 'emails', v.v. và sắp xếp thứ tự các kết quả tương ứng.
+->SQL quá cứng nhắc.
+
+## Dùng NoSQL (MongoDB) thay thế
+Dữ liệu của bảng 'contacts' liên quan đến con người. Chúng ta không thể đoán trước được yêu cầu sẽ thay đổi theo thời gian. Vậy nên, lúc này NoSQL sẽ phát huy ưu điểm 
+của mình. Chúng ta có thể lưu tất cả dữ liệu liên quan đến 'contacts' trong một document của một collection duy nhất, ví dụ như sau:
+
+{
+  "name": ["Billy", "Bob", "Jones"],
+  "company": "Fake Goods Corp",
+  "jobtitle": "Vice President of Data Management",
+  "telephone": {
+    "home": "0123456789",
+    "mobile": "9876543210",
+    "work": "2244668800"
+  },
+  "email": {
+    "personal": "bob@myhomeemail.net",
+    "work": "bob@myworkemail.com"
+  },
+  "address": {
+    "home": {
+      "line1": "10 Non-Existent Street",
+      "city": "Nowhere",
+      "country": "Australia"
+    }
+  },
+  "birthdate": "1980-01-01T00:00:00.000Z",
+  "twitter": "@bobsfakeaccount",
+  "note": "Don't trust this guy",
+  "weight": "200lb",
+  "photo": "52e86ad749e0b817d25c8892.jpg"
+}
+
+
+## Nhận xét
+Trong dữ liệu trên, chúng ta chưa lưu 'date_of_birth' hay 'social_network_account', nhưng không sao, vì NoSQL rất linh hoạt trong trường hợp này, có thể thêm, sửa, xóa 
+thoải mái.
+Vì chúng ta lưu hết trong một document, chúng ta có thể dễ dàng biết được cấu trúc tổng quát của dữ liệu, cũng như dễ dàng thực hiện full-text search trên tất cả các 
+trường trong 'contacts'.
+Đầu tiên, chúng ta định nghĩa index cho tất cả các trường trong collection 'contacts':
+  db.contacts.createIndex({ '$**': 'text' })
+và thực hiện full-text search:
+  db.contacts.find({
+    $text: { $search: 'something' }
+  })
+
+
+## Khi nào nên dùng MongoDB
+MongoDB là cơ sở dữ liệu đa năng được sử dụng theo nhiều cách khác nhau và có thể ứng dụng trong nhiều ngành nghề (viễn thông, game, tài chính, sức khỏe, bán lẻ).
+- Khi muốn tách hợp lượng dữ liệu lớn.
+- Dữ liệu có cấu trúc phức tạp.
+- Khi cần một cơ sở dữ liệu có khả năng mở rộng nhanh, rẻ.
+- Khi cần một cơ sở dữ liệu giúp tăng tốc độ phát triển phần mềm.
+
+## Khi nào nên dùng SQL
+- Cần một cơ sở dữ liệu chặt chẽ về cấu trúc.
+- Bạn quen thuộc với ngôn ngữ SQL.
+
+## Kết nối MongoDB
+
+- Dùng Mongo Compass
+- Dùng MongoSH (terminal)
+- Dùng mongo driver (SDK tích hợp vào code)
+- Dùng Extension MongoDB cho VS Code
+
+## Một số thuật ngữ trong MongoDB
+  Organizations: Cấp độ cao nhất trong MongoDB Atlas, là một đơn vị tổ chức lớn.
+  Project: Một Organization có thể chứa nhiều project. Mỗi project là một không gian làm việc độc lập trong MongoDB Atlas.
+  Cluster: Một project có thể chứa nhiều cluster. Cluster có thể hiểu như là một máy chủ ảo hoặc một nhóm các máy chủ dùng để cài đặt MongoDB. Mỗi cluster là một bản sao của MongoDB chạy trên các máy chủ có khả năng mở rộng.
+  Database: Một cluster có thể chứa nhiều database. Database trong MongoDB tương tự như database trong hệ quản trị cơ sở dữ liệu SQL, là nơi lưu trữ các tập hợp dữ liệu liên quan.
+  Collection: Trong mỗi database, chúng ta có các collection. Collection trong MongoDB tương đương với bảng trong SQL. Mỗi collection là một tập hợp các tài liệu có cấu trúc tương tự nhau.
+  Document: Mỗi collection chứa nhiều document. Document trong MongoDB tương đương với hàng trong SQL. Mỗi document là một bản ghi độc lập chứa dữ liệu dưới dạng BSON (Binary JSON).
+
+Điều này có nghĩa là dữ liệu trong MongoDB được tổ chức theo các cấp độ từ cao đến thấp như sau: Organizations > Project > Cluster > Database > Collection > Document.
 ## Thiết kế schema Twitter bằng MongoDB
+
 ## ghi chú:
 tên collection nên đặt theo dạng số nhiều, kiểu snake_case: users
 tên field nên đặt theo kiểu snake_case: email_verify_token
@@ -218,161 +389,3 @@ interface Bookmark {
   tweet_id: ObjectId
   created_at: Date
 }
-______________________________
-Đây là đoạn văn đã được sửa lại cho đúng ngữ pháp và dễ hiểu hơn:
-
----
-
-## SQL vs NoSQL
-
-### SQL
-
-- Học một ngôn ngữ nhưng có thể sử dụng ở nhiều cơ sở dữ liệu khác nhau.
-- Schema chặt chẽ.
-- Khuyến khích các tiêu chuẩn chuẩn hóa để giảm thiểu sự dư thừa dữ liệu.
-- Có thể mở rộng nhưng sẽ hơi tốn công.
-
-### NoSQL
-
-- Dữ liệu được lưu dưới dạng JSON với các cặp key-value.
-- Không cần schema, lưu được hầu như bất cứ thứ gì.
-- Hiệu năng tuyệt vời, mở rộng theo chiều ngang dễ dàng.
-
-### Ví dụ NoSQL
-Chúng ta cần xây dựng hệ thống dữ liệu cho danh bạ. Vậy nên sau khi khảo sát, chúng ta có được bảng 'contacts' như sau:
-
-- id
-- title
-- firstname
-- lastname
-- gender
-- telephone
-- email
-- address1
-- address2
-- address3
-- city
-- region
-- zipcode
-- country
----
-
-## Vấn đề 1: Sau một thời gian làm việc với code, chúng ta nhận ra rằng rất ít người chỉ có một số điện thoại. Thường thì họ sẽ có số điện thoại nơi làm việc, ở nhà, cá nhân, v.v. Do đó, chúng ta không thể thêm các cột như 'telephone1', 'telephone2', ... vào bảng 'contacts' được. Thay vào đó, chúng ta sẽ tạo thêm một bảng riêng là 'telephones' với các trường:
-
-- id
-- contact_id
-- number
-- telephone_type (kiểu enum để lưu loại số điện thoại: ở nhà, công ty, ...)
-
-## Vấn đề 2: Chúng ta lại gặp vấn đề tương tự với email, khi người dùng có thể có nhiều email. Vì vậy, chúng ta sẽ tạo thêm bảng 'emails' với các trường:
-
-- id
-- contact_id
-- address
-- email_type (có thể lưu dưới dạng text hoặc enum cho các loại email: cá nhân, công ty, ...)
-
-## Vấn đề 3: Người dùng có thể có nhiều địa chỉ nhà, nên chúng ta tạo thêm bảng 'addresses' với các trường:
-
-- id
-- contact_id
-- address_type
-- address
-- city
-- region
-- zipcode
-- country
-
-Cuối cùng, bảng 'contacts' sẽ có các trường:
-
-- id
-- title
-- firstname
-- lastname
-- gender
-
-Với cách tiếp cận này, chúng ta đã chuẩn hóa được dữ liệu, phòng ngừa rủi ro khi dữ liệu tăng lên.
-
-## Nhưng không
-Chúng ta chưa xem xét hết các yêu cầu trong tương lai. Chỉ vài tuần nữa, yêu cầu có thể là thêm các trường như 'date_of_birth', 'company' vào bảng 'contacts'. 
-Và cho dù chúng ta thêm bao nhiêu trường đi nữa thì cũng không thể cảm thấy đủ, vì các yêu cầu sẽ liên tục được bổ sung như 'social_network_account', 'hobby', ... 
-Vậy mỗi lần thêm một trường vào bảng, chúng ta đều phải suy nghĩ đến việc tạo thêm một bảng 'otherdata' hay sao?
-> Điều này làm cho cơ sở dữ liệu của chúng ta bị chia nhỏ ra hàng chục, hàng trăm bảng, dẫn đến phân mảnh dữ liệu. Việc phân mảnh cơ sở dữ liệu sẽ làm cho các lập trình
-viên khó quan sát được logic của hệ thống, và độ phức tạp tăng lên, dẫn đến thời gian phát triển ứng dụng bị chậm lại.
-Khi chúng ta muốn truy vấn để lấy dữ liệu đầy đủ của một contact, chúng ta phải dùng JOIN kết hợp với hàng chục bảng liên quan.
-
-Áp dụng full-text search cũng khó hơn. Ví dụ, khi ai đó nhập một chuỗi bất kỳ để tìm kiếm trong danh bạ, chúng ta phải kiểm tra tất cả trong các bảng 'contacts', 
-'telephones', 'addresses', 'emails', v.v. và sắp xếp thứ tự các kết quả tương ứng.
-->SQL quá cứng nhắc.
-
-## Dùng NoSQL (MongoDB) thay thế
-Dữ liệu của bảng 'contacts' liên quan đến con người. Chúng ta không thể đoán trước được yêu cầu sẽ thay đổi theo thời gian. Vậy nên, lúc này NoSQL sẽ phát huy ưu điểm 
-của mình. Chúng ta có thể lưu tất cả dữ liệu liên quan đến 'contacts' trong một document của một collection duy nhất, ví dụ như sau:
-
-{
-  "name": ["Billy", "Bob", "Jones"],
-  "company": "Fake Goods Corp",
-  "jobtitle": "Vice President of Data Management",
-  "telephone": {
-    "home": "0123456789",
-    "mobile": "9876543210",
-    "work": "2244668800"
-  },
-  "email": {
-    "personal": "bob@myhomeemail.net",
-    "work": "bob@myworkemail.com"
-  },
-  "address": {
-    "home": {
-      "line1": "10 Non-Existent Street",
-      "city": "Nowhere",
-      "country": "Australia"
-    }
-  },
-  "birthdate": "1980-01-01T00:00:00.000Z",
-  "twitter": "@bobsfakeaccount",
-  "note": "Don't trust this guy",
-  "weight": "200lb",
-  "photo": "52e86ad749e0b817d25c8892.jpg"
-}
-
-
-## Nhận xét
-Trong dữ liệu trên, chúng ta chưa lưu 'date_of_birth' hay 'social_network_account', nhưng không sao, vì NoSQL rất linh hoạt trong trường hợp này, có thể thêm, sửa, xóa 
-thoải mái.
-Vì chúng ta lưu hết trong một document, chúng ta có thể dễ dàng biết được cấu trúc tổng quát của dữ liệu, cũng như dễ dàng thực hiện full-text search trên tất cả các 
-trường trong 'contacts'.
-Đầu tiên, chúng ta định nghĩa index cho tất cả các trường trong collection 'contacts':
-  db.contacts.createIndex({ '$**': 'text' })
-và thực hiện full-text search:
-  db.contacts.find({
-    $text: { $search: 'something' }
-  })
-
-
-## Khi nào nên dùng MongoDB
-MongoDB là cơ sở dữ liệu đa năng được sử dụng theo nhiều cách khác nhau và có thể ứng dụng trong nhiều ngành nghề (viễn thông, game, tài chính, sức khỏe, bán lẻ).
-- Khi muốn tách hợp lượng dữ liệu lớn.
-- Dữ liệu có cấu trúc phức tạp.
-- Khi cần một cơ sở dữ liệu có khả năng mở rộng nhanh, rẻ.
-- Khi cần một cơ sở dữ liệu giúp tăng tốc độ phát triển phần mềm.
-
-## Khi nào nên dùng SQL
-- Cần một cơ sở dữ liệu chặt chẽ về cấu trúc.
-- Bạn quen thuộc với ngôn ngữ SQL.
-
-## Kết nối MongoDB
-
-- Dùng Mongo Compass
-- Dùng MongoSH (terminal)
-- Dùng mongo driver (SDK tích hợp vào code)
-- Dùng Extension MongoDB cho VS Code
-
-## Một số thuật ngữ trong MongoDB
-  Organizations: Cấp độ cao nhất trong MongoDB Atlas, là một đơn vị tổ chức lớn.
-  Project: Một Organization có thể chứa nhiều project. Mỗi project là một không gian làm việc độc lập trong MongoDB Atlas.
-  Cluster: Một project có thể chứa nhiều cluster. Cluster có thể hiểu như là một máy chủ ảo hoặc một nhóm các máy chủ dùng để cài đặt MongoDB. Mỗi cluster là một bản sao của MongoDB chạy trên các máy chủ có khả năng mở rộng.
-  Database: Một cluster có thể chứa nhiều database. Database trong MongoDB tương tự như database trong hệ quản trị cơ sở dữ liệu SQL, là nơi lưu trữ các tập hợp dữ liệu liên quan.
-  Collection: Trong mỗi database, chúng ta có các collection. Collection trong MongoDB tương đương với bảng trong SQL. Mỗi collection là một tập hợp các tài liệu có cấu trúc tương tự nhau.
-  Document: Mỗi collection chứa nhiều document. Document trong MongoDB tương đương với hàng trong SQL. Mỗi document là một bản ghi độc lập chứa dữ liệu dưới dạng BSON (Binary JSON).
-
-Điều này có nghĩa là dữ liệu trong MongoDB được tổ chức theo các cấp độ từ cao đến thấp như sau: Organizations > Project > Cluster > Database > Collection > Document.
