@@ -1,27 +1,31 @@
-https://duthanhduoc.com/blog/setup-du-an-nodejs-typescript
-NTS: nodejs typescript eslint
+## tài nguyên tham khảo
+link figma:
+https://drive.google.com/file/d/1cfuDjVSR7JZp-xOK0mo_iov5bHUiUiUh/view?usp=sharing
+thiết kế csdl sau cho chuẩn:
+https://duthanhduoc.com/blog/thiet-ke-co-so-du-lieu-voi-mongodb
+git:
+https://duthanhduoc.com/blog/toi-hoc-lai-git-tu-dau-part-1
+https://duthanhduoc.com/blog/toi-hoc-lai-git-tu-dau-part-2
+https://duthanhduoc.com/blog/top-nhung-cau-lenh-git-dung-trong-thuc-te
+authentication
+## thiết kế csdl mongo db sao cho chuẩn:
+## Recap
+  1 - 1: Ưu tiên cặp key-value trong document
+  1 - ít: Ưu tiên nhúng
+  1 - nhiều: Ưu tiên tham chiếu
+  1 - rất nhiều: Ưu tiên tham chiếu
+  Nhiều - Nhiều: Ưu tiên tham chiếu
+## Các quy tắc khi thiết kế cơ sở dữ liệu bằng MongoDB
+  Quy tắc 1: Ưu tiên nhúng trừ khi chúng ta có một lý do thuyết phục để không làm như vậy
+  Quy tắc 2: Khi cần truy cập vào một đối tượng riêng biệt, đây là lúc không dùng nhúng
+  Quy tắc 3: Tránh joins/lookups nếu có thể, nhưng cũng đừng sợ nếu nó giúp chúng ta có một schema tốt hơn
+  Quy tắc 4: Array không nên phát triển không giới hạn. Nếu có hơn vài trăm document ở phía "nhiều" thì đừng nhúng chúng; Nếu có hơn vài ngàn document ở phía "nhiều" thì đừng sử dụng array ObjectID tham chiếu. Mảng với số lượng lớn item là lý do không nên dùng nhúng.
+  Quy tắc 5: Với MongoDB, cách bạn mô hình hóa dữ liệu phụ thuộc vào cách bạn sử dụng dữ liệu. Bạn muốn cấu trúc dữ liệu của bạn phù hợp với cách mà ứng dụng của bạn query và update nó.
 
-____
-kỹ năng xử lí lỗi
-- lỗi typescript: lỗi liên quan đến kiểu dữ liệu không đúng, có thể bypass bằng any hoặc setting tsconfig
-- lỗi eslint: lỗi liên quan đến linter, có thể bypass bằng disable eslint
-- lỗi node.js: đây là lỗi nghiêm trọng liên quan đến code. không nên bypass lỗi này mà phải xử lý
-cách debug
-- dùng run and debug vscode
-- dùng chat gpt
-- console.log
+## authentication
+https://duthanhduoc.com/blog/p1-giai-ngo-authentication-basic-authentication
+https://duthanhduoc.com/blog/p2-giai-ngo-authentication-session
+https://duthanhduoc.com/blog/p3-giai-ngo-authentication-jwt
+https://duthanhduoc.com/blog/p4-luu-jwt-token-o-localstorage-hay-cookie
+https://duthanhduoc.com/blog/p5-giai-ngo-authentication-OAuth2
 
-
-lỗi typescript: 
-bypass bằng `as any` hoặc `as Type...`:
-render(user as any)
-bypass bằng thêm option `--transpileOnly` vào ts-node
-link: https://github.com/TypeStrong/ts-node/tree/main/transpilers
-
-lỗi eslint: 
-file .eslintrc có rule
-
-lỗi nodejs:
-một chút về postman
-
-debug bằng vscode: để sau, hơi lười
